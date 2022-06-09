@@ -294,6 +294,8 @@ class _HomePageState extends State<HomePage> {
   void _tagRead() {
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
       result.value = tag.data;
+setState((){
+textInputController.text="040C30EA606781"});
       NfcManager.instance.stopSession();
     });
   }
