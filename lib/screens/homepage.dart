@@ -5,7 +5,10 @@ import 'package:demo_app/widgets/image_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:nfc_in_flutter/nfc_in_flutter.dart';
+import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:nfc_manager/nfc_manager.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -15,6 +18,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  ValueNotifier<dynamic> result = ValueNotifier(null);
+
   @override
   @override
   void initState() {
@@ -56,6 +61,51 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(
               height: 10,
             ),
+            Column(
+              children: [
+                FutureBuilder<bool>(
+                  future: NfcManager.instance.isAvailable(),
+                  builder: (context, ss) => ss.data != true
+                      ? const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Center(
+                              child: Text(
+                            'Nfc is not Supported on this device ',
+                            style: TextStyle(color: Colors.red, fontSize: 15),
+                          )),
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 10),
+                          child: SizedBox(
+                            height: 100,
+                            child: Flex(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              direction: Axis.vertical,
+                              children: [
+                                Flexible(
+                                  flex: 2,
+                                  child: Container(
+                                    margin: const EdgeInsets.all(4),
+                                    constraints: const BoxConstraints.expand(),
+                                    decoration:
+                                        BoxDecoration(border: Border.all()),
+                                    child: SingleChildScrollView(
+                                      child: ValueListenableBuilder<dynamic>(
+                                        valueListenable: result,
+                                        builder: (context, value, _) =>
+                                            Text('${value ?? ''}'),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                ),
+              ],
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -65,7 +115,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(
                   height: 40,
-                  width: 200,
+                  width: 250,
                   child: TextField(
                     controller: textInputController,
                     autofocus: true,
@@ -94,9 +144,7 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: () {
-                    readNfcTag();
-                  },
+                  onPressed: _tagRead,
                   child: const Text("Scan Tag"),
                 ),
                 ElevatedButton(
@@ -243,19 +291,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void readNfcTag() async {
-    try {
-      NDEFMessage message = await NFC.readNDEF(once: true).first;
-      if (kDebugMode) {
-        print("payload: ${message.payload}");
-      }
-      setState(() {
-        textInputController.text = message.payload;
-      });
-    } catch (error) {
-      if (kDebugMode) {
-        print(error);
-      }
-    }
+  void _tagRead() {
+    NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
+      result.value = tag.data;
+      NfcManager.instance.stopSession();
+    });
   }
 }
