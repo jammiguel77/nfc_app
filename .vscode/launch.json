@@ -1,0 +1,11 @@
+{  "configurations": [
+    {
+      "name": "Flutter",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "deb--no-sound-null-safetyug",
+      "args": [""]
+    }
+     ]
+    }
+
