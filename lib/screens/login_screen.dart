@@ -19,8 +19,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
 
- 
-
   @override
   void dispose() {
     usernameController.dispose();
@@ -73,6 +71,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: InputDecoration(
                         focusColor: Colors.black,
                         contentPadding: const EdgeInsets.all(15.0),
+                        suffixIcon: IconButton(
+                            onPressed: () {
+                              usernameController.clear();
+                            },
+                            icon: const Icon(Icons.clear)),
                         suffixIconColor: Colors.black87,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0),
@@ -123,6 +126,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         focusColor: Colors.black,
                         contentPadding: const EdgeInsets.all(15.0),
                         suffixIconColor: Colors.black87,
+                        suffixIcon: IconButton(
+                            onPressed: () {
+                              passwordController.clear();
+                            },
+                            icon: const Icon(Icons.clear)),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0),
                           borderSide: const BorderSide(
@@ -171,6 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final loginRequestJson = jsonDecode(loginRequestResult.body);
     validateUser(username, password, loginRequestJson);
   }
+
   // catch exceptions here
   void validateUser(String username, String password, json) {
     print(json);
@@ -196,5 +205,4 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
   }
-
 }

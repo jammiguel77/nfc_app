@@ -28,7 +28,7 @@ class _HomePageState extends State<HomePage> {
 
   bool isimagesAndPdfWidgetsDisplayed = false;
 
-  final textInputController = TextEditingController();
+  final SearchInputController = TextEditingController();
   String documentPhoto1Url = "";
   String documentPhoto2Url = "";
   String documentPhoto3Url = "";
@@ -117,12 +117,17 @@ class _HomePageState extends State<HomePage> {
                   height: 40,
                   width: 250,
                   child: TextField(
-                    controller: textInputController,
+                    controller: SearchInputController,
                     autofocus: true,
                     decoration: InputDecoration(
                       focusColor: Colors.black,
                       contentPadding: const EdgeInsets.all(15.0),
                       suffixIconColor: Colors.black87,
+                      suffixIcon: IconButton(
+                          onPressed: () {
+                            SearchInputController.clear();
+                          },
+                          icon: const Icon(Icons.clear)),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(5.0),
                         borderSide: const BorderSide(
@@ -150,7 +155,7 @@ class _HomePageState extends State<HomePage> {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(primary: Colors.green),
                   onPressed: () {
-                    getDocumentDetailsRequest(textInputController.text);
+                    getDocumentDetailsRequest(SearchInputController.text);
                   },
                   child: const Text("Consultar"),
                 ),
@@ -294,8 +299,9 @@ class _HomePageState extends State<HomePage> {
   void _tagRead() {
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
       result.value = tag.data;
-setState((){
-textInputController.text="040C30EA606781"});
+      setState(() {
+        SearchInputController.text = "040C30EA606781";
+      });
       NfcManager.instance.stopSession();
     });
   }
