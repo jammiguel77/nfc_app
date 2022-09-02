@@ -1,5 +1,6 @@
 import 'package:easy_pdf_viewer/easy_pdf_viewer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class PdfViewerWidget extends StatefulWidget {
   const PdfViewerWidget({Key? key, required this.documentUrl})
@@ -12,7 +13,7 @@ class PdfViewerWidget extends StatefulWidget {
 
 class _PdfViewerWidgetState extends State<PdfViewerWidget> {
   bool isLoading = true;
-  var document;
+  PDFDocument? document;
 
   @override
   void initState() {
@@ -24,15 +25,33 @@ class _PdfViewerWidgetState extends State<PdfViewerWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Pdf"),
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarBrightness: Brightness.light,
+          statusBarColor: Colors.white,
+          statusBarIconBrightness: Brightness.dark,
+        ),
+        title: const Text(
+          "Pdf Document",
+          style: TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: Center(
         child: isLoading
             ? const Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(color: Colors.black),
               )
             : PDFViewer(
-                document: document,
+                document: document!,
                 lazyLoad: false,
                 scrollDirection: Axis.vertical,
               ),

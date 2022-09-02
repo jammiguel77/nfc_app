@@ -1,3 +1,4 @@
+import 'package:demo_app/widgets/action_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:flutter_mailer/flutter_mailer.dart';
@@ -8,57 +9,64 @@ class ImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var deviceScreen = MediaQuery.of(context).size;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
-      child: GestureDetector(
-          onTap: () => showImageBottomSheet(context, image),
-          child: Image(
-            image: NetworkImage(
-              image,
-            ),
-            errorBuilder: (context, error, stackTrace) => const Padding(
-              padding: EdgeInsets.all(10.0),
-              child: Icon(Icons.error, color: Colors.red),
-            ),
-          )),
-    );
-  }
-
-  Future<void> showImageBottomSheet(BuildContext context, image) {
-    return showModalBottomSheet<void>(
-        backgroundColor: Colors.white,
-        context: context,
-        builder: (BuildContext context) {
-          return SizedBox(
-            height: 120,
-            child: Column(
-              children: [
-                ListTile(
-                  title: const Text("Download Image"),
-                  onTap: () {
-                    downloadImage(context, image);
-                  },
-                  leading: const Icon(Icons.save),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+        child: Container(
+            height: deviceScreen.height * .3,
+            width: deviceScreen.width * .9,
+            decoration: ShapeDecoration(
+                color: Colors.grey.shade100,
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20)))),
+            child: Column(children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image(
+                    height: 120,
+                    image: NetworkImage(
+                      image,
+                    ),
+                    errorBuilder: (context, error, stackTrace) => const Center(
+                        child: Icon(
+                      Icons.error,
+                      color: Color.fromARGB(255, 240, 106, 97),
+                      size: 100,
+                    )),
+                  ),
                 ),
-                ListTile(
-                  title: const Text("Email Image"),
-                  onTap: () {
-                    emailImage(image);
-                  },
-                  leading: const Icon(Icons.email_rounded),
-                ),
-              ],
-            ),
-          );
-        });
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ActionButton(
+                      color: Colors.green,
+                      text: "Save",
+                      onPressed: () {
+                        downloadImage(context, image);
+                      },
+                      iconData: Icons.save_alt),
+                  ActionButton(
+                      color: Colors.red,
+                      text: "Email",
+                      onPressed: () async {
+                        String emailResponse = await emailImage(image);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(emailResponse)));
+                      },
+                      iconData: Icons.email_rounded),
+                ],
+              )
+            ])));
   }
 
   void downloadImage(BuildContext context, image) async {
     GallerySaver.saveImage(image);
-    Navigator.pop(context);
   }
 
-  void emailImage(image) async {
+  Future<String> emailImage(image) async {
     final MailOptions mailOptions = MailOptions(
       body: '',
       subject: '',
@@ -88,11 +96,12 @@ class ImageWidget extends StatelessWidget {
         platformResponse = 'mail was cancelled';
         break;
       case MailerResponse.android:
-        platformResponse = 'intent was successful';
+        platformResponse = 'Email intent';
         break;
       default:
         platformResponse = 'unknown';
         break;
     }
+    return platformResponse;
   }
 }

@@ -13,10 +13,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+       debugShowCheckedModeBanner: false,
         title: 'NFC',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primaryColor: Colors.black,
+          fontFamily: "PulpDisplay",
         ),
-        home: const LoginScreen());
+        home: const HomePage());
   }
 }
